@@ -1,13 +1,18 @@
-import './globals.css'
-import { Inter } from 'next/font/google'
-import { Nunito } from 'next/font/google'
-import Navbar from './components/Navbar'
-const inter = Inter({ subsets: ['latin'] })
-const font = Nunito({ subsets: ['latin'] })
+// RootLayout.js
+import './globals.css';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Inter } from 'next/font/google';
+import { Nunito } from 'next/font/google';
+import Navbar from './components/Navbar';
+
+const inter = Inter({ subsets: ['latin'] });
+const font = Nunito({ subsets: ['latin'] });
+
 export const metadata = {
   title: 'Airbnb',
   description: 'Hotel Booking App',
-}
+};
 
 export default function RootLayout({ children }) {
   return (
@@ -15,9 +20,8 @@ export default function RootLayout({ children }) {
       <body className={font.className}>
         <Navbar />
         {children}
-
+        <ToastContainer />
       </body>
     </html>
-  )
+  );
 }
-

@@ -1,5 +1,5 @@
 import { AuthOptions } from "next-auth";
-import prisma from "@/app/lib/prismadb";
+import prisma from "../../../lib/prismadb";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -43,7 +43,7 @@ const authOptions = {
   ],
 
   pages:{
-    signin:'/'
+    signIn:'/'
   },
   // Add other NextAuth.js options as needed
   // For example, you can set the session or callbacks options here
