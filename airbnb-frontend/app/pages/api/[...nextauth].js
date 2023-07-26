@@ -3,7 +3,8 @@ import prisma from "@/app/lib/prismadb";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-
+import bcrypt from "bcrypt";
+import NextAuth from "next-auth";
 const authOptions = {
   adapter: PrismaAdapter(prisma), // Use PrismaAdapter with the Prisma instance
   providers: [
@@ -23,6 +24,7 @@ const authOptions = {
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
+        if(!credentials?.email || !credentials?.password){throw new Error("Invalid Credentials")}
         // Add your custom login logic here
         // Example: Check if the email and password are valid in your database
         const user = await prisma.user.findFirst({
@@ -30,26 +32,30 @@ const authOptions = {
             email: credentials.email,
           },
         });
+        if(!user || !user?.hashedPassword){throw new Error('Invalid Credentials')}
+        const isCorrectPassword = await bcrypt.compare(credentials.password,user.hashedPassword);
+        if(!isCorrectPassword) { throw new Error("Invalid Credentials");}
+        return user;
 
-        if (user && user.password === credentials.password) {
-          // Return the user object to indicate successful login
-          return Promise.resolve(user);
-        } else {
-          // Return null or false to indicate login failed
-          return Promise.resolve(null);
-        }
+
       },
     }),
   ],
 
+  pages:{
+    signin:'/'
+  },
   // Add other NextAuth.js options as needed
   // For example, you can set the session or callbacks options here
   session: {
     // Add session configuration if needed
+    strategy:"jwt"
+
   },
   callbacks: {
     // Add callbacks configuration if needed
   },
+  secret:process.env.NEXT_AUTH_SECRET,
 };
 
-export default authOptions;
+export default NextAuth(authOptions);
