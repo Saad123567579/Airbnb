@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Inter } from 'next/font/google';
 import { Nunito } from 'next/font/google';
 import Navbar from './components/Navbar';
-
+import getCurrentUser from './actions/getCurrentUser';
 const inter = Inter({ subsets: ['latin'] });
 const font = Nunito({ subsets: ['latin'] });
 
@@ -14,11 +14,13 @@ export const metadata = {
   description: 'Hotel Booking App',
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const currentUser = await getCurrentUser();
+
   return (
     <html lang="en">
       <body className={font.className}>
-        <Navbar />
+        <Navbar currentUser={currentUser} />
         {children}
         <ToastContainer />
       </body>

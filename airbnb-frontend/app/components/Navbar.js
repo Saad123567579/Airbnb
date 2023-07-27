@@ -7,10 +7,12 @@ import { Dialog, Transition } from '@headlessui/react'
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { signIn } from "next-auth/react";
+import { signIn , signOut } from "next-auth/react";
 import { useRouter } from 'next/navigation';
 
-const Navbar = () => {
+const Navbar = (props) => {
+
+    const { currentUser } = props;
     const router = useRouter();
     const { register, handleSubmit, reset, watch, formState: { errors } } = useForm();
 
@@ -34,13 +36,15 @@ const Navbar = () => {
         });
 
         // Check if the response is successful
-        if (!response.ok) {
+        if (response.error) {
             toast.error('An Error Occurred')
         }
         setOpen(false);
         // Parse the response as JSON
         const responseData = await response.json();
         console.log(responseData);
+        toast.success("Account Created");
+
         reset();
 
 
@@ -52,42 +56,36 @@ const Navbar = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        let email = document.getElementById('e').value;
-        let password = document.getElementById('p').value;
-        if (email === "" || password === "") { toast.error('Fill The Form Correctly'); return; }
+        let email = document.getElementById("e").value;
+        let password = document.getElementById("p").value;
+        if (email === "" || password === "") {
+            toast.error("Fill The Form Correctly");
+            return;
+        }
         let data = { email, password };
         console.log(data);
-        const response = await signIn('credentials', {
+
+        // Call the signIn function and handle the response
+        const response = await signIn("credentials", {
             ...data,
             redirect: false,
-        })
-        if(!response.ok){console.log("Unable");return;}
-        const d = await response.json();
-        console.log(d);
+        });
+        console.log(response);
 
-
-
-
-        // signIn('credentials', {
-        //     ...data,
-        //     redirect: false,
-        // })
-        //     .then((callback) => {
-        //         setIsLoading(false);
-
-        //         if (callback?.ok) {
-        //             toast.success('Logged in');
-        //             router.refresh();
-        //             setlogOpen(false);
-        //         }
-
-        //         if (callback?.error) {
-        //             toast.error(callback.error);
-        //         }
-        //     });
-
-
-    }
+        if (response.error) {
+            // Handle the custom error message here
+            console.log("Login Error:", response.error);
+            toast.error(response.error);
+        } else {
+            // Login success, do something
+            console.log("Login successful");
+            console.log(response); // Contains user data
+            toast.success("Welcome Back");
+            router.refresh();
+            window.location.href = "/";
+            // Redirect or handle the successful login
+        }
+    };
 
 
 
@@ -116,10 +114,10 @@ const Navbar = () => {
                                     onClick={toggleDropdown}
                                     className="bg-white text-gray-700 font-semibold py-2 px-4 rounded inline-flex items-center hover:shadow-md "
                                 >
-                                    <img src="https://github.com/AntonioErdeljac/next13-airbnb-clone/blob/master/public/images/placeholder.jpg?raw=true" className='rounded-full' width={50} height={50}></img>
+                                    <img src={currentUser?.image?(currentUser.image):("https://github.com/AntonioErdeljac/next13-airbnb-clone/blob/master/public/images/logo.png?raw=true")} className='rounded-full' width={50} height={50}></img>
 
                                 </button>
-                                {isOpen && (
+                                {isOpen && !currentUser && (
                                     <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-lg">
                                         <a onClick={() => setOpen(true)}
                                             href="#"
@@ -132,6 +130,48 @@ const Navbar = () => {
                                             className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                                         >
                                             Login
+                                        </a>
+
+                                    </div>
+                                )}
+
+                                {isOpen && currentUser && (
+                                    <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-lg">
+                                        <a onClick={() => setOpen(true)}
+                                            href="#"
+                                            className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                                        >
+                                            My Trips
+                                        </a>
+                                        <a onClick={() =>{}}
+                                            href="#"
+                                            className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                                        >
+                                            My Favourites
+                                        </a>
+                                        <a onClick={() => {}}
+                                            href="#"
+                                            className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                                        >
+                                            My Reservations
+                                        </a>
+                                        <a onClick={() => {}}
+                                            href="#"
+                                            className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                                        >
+                                            My Properties
+                                        </a>
+                                        <a onClick={() => {}}
+                                            href="#"
+                                            className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                                        >
+                                            Airbnb My home
+                                        </a>
+                                        <a onClick={() => {signOut()}}
+                                            href="#"
+                                            className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                                        >
+                                            Log Out
                                         </a>
 
                                     </div>
@@ -227,6 +267,7 @@ const Navbar = () => {
 
                                                     />
                                                     <button
+                                                        onClick={()=>{signIn('google')}}
                                                         type="button"
                                                         className="mt-3  inline-flex w-full justify-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50 w-full"
 
@@ -328,6 +369,7 @@ const Navbar = () => {
 
                                                     />
                                                     <button
+                                                        onClick={()=>{signIn('google')}}
                                                         type="button"
                                                         className="mt-3  inline-flex w-full justify-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50 w-full"
 

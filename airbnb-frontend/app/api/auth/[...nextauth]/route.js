@@ -5,13 +5,13 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import NextAuth from "next-auth";
-const authOptions = {
+export const authOptions = {
   adapter: PrismaAdapter(prisma), // Use PrismaAdapter with the Prisma instance
   providers: [
     // Google authentication provider
     GoogleProvider({
-      clientId: "YOUR_GOOGLE_CLIENT_ID",
-      clientSecret: "YOUR_GOOGLE_CLIENT_SECRET",
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
 
     // Credentials authentication provider (for custom login)
@@ -24,38 +24,45 @@ const authOptions = {
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
-        if(!credentials?.email || !credentials?.password){throw new Error("Invalid Credentials")}
-        // Add your custom login logic here
-        // Example: Check if the email and password are valid in your database
-        const user = await prisma.user.findFirst({
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Invalid Credentials");
+        }
+
+        const user = await prisma.user.findUnique({
           where: {
             email: credentials.email,
           },
         });
-        if(!user || !user?.hashedPassword){throw new Error('Invalid Credentials')}
-        const isCorrectPassword = await bcrypt.compare(credentials.password,user.hashedPassword);
-        if(!isCorrectPassword) { throw new Error("Invalid Credentials");}
+        if (!user || !user?.hashedPassword) {
+          throw new Error("Invalid Credentials");
+        }
+        const isCorrectPassword = await bcrypt.compare(
+          credentials.password,
+          user.hashedPassword
+        );
+        if (!isCorrectPassword) {
+          throw new Error("Invalid Credentials");
+        }
         return user;
-
-
       },
     }),
   ],
 
-  pages:{
-    signIn:'/'
+  pages: {
+    signIn: "/",
   },
   // Add other NextAuth.js options as needed
   // For example, you can set the session or callbacks options here
   session: {
     // Add session configuration if needed
-    strategy:"jwt"
-
+    strategy: "jwt",
   },
   callbacks: {
     // Add callbacks configuration if needed
   },
-  secret:process.env.NEXT_AUTH_SECRET,
+  secret: process.env.NEXT_AUTH_SECRET,
+  debug: true,
 };
 
-export default NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };
