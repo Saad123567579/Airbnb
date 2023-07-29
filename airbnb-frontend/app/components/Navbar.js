@@ -7,12 +7,13 @@ import { Dialog, Transition } from '@headlessui/react'
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { signIn , signOut } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { useRouter } from 'next/navigation';
 
 const Navbar = (props) => {
 
     const { currentUser } = props;
+    
     const router = useRouter();
     const { register, handleSubmit, reset, watch, formState: { errors } } = useForm();
 
@@ -114,7 +115,7 @@ const Navbar = (props) => {
                                     onClick={toggleDropdown}
                                     className="bg-white text-gray-700 font-semibold py-2 px-4 rounded inline-flex items-center hover:shadow-md "
                                 >
-                                    <img src={currentUser?.image?(currentUser.image):("https://github.com/AntonioErdeljac/next13-airbnb-clone/blob/master/public/images/logo.png?raw=true")} className='rounded-full' width={50} height={50}></img>
+                                    <img src={currentUser?.image ? (currentUser.image) : ("https://github.com/AntonioErdeljac/next13-airbnb-clone/blob/master/public/images/logo.png?raw=true")} className='rounded-full' width={50} height={50}></img>
 
                                 </button>
                                 {isOpen && !currentUser && (
@@ -137,37 +138,37 @@ const Navbar = (props) => {
 
                                 {isOpen && currentUser && (
                                     <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-lg">
-                                        <a onClick={() => setOpen(true)}
+                                        <a onClick={() => {}}
                                             href="#"
                                             className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                                         >
                                             My Trips
                                         </a>
-                                        <a onClick={() =>{}}
+                                        <a onClick={() => { }}
                                             href="#"
                                             className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                                         >
                                             My Favourites
                                         </a>
-                                        <a onClick={() => {}}
+                                        <a onClick={() => { }}
                                             href="#"
                                             className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                                         >
                                             My Reservations
                                         </a>
-                                        <a onClick={() => {}}
+                                        <a onClick={() => { }}
                                             href="#"
                                             className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                                         >
                                             My Properties
                                         </a>
-                                        <a onClick={() => {}}
+                                        <a onClick={() => { }}
                                             href="#"
                                             className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                                         >
                                             Airbnb My home
                                         </a>
-                                        <a onClick={() => {signOut()}}
+                                        <a onClick={() => { signOut() }}
                                             href="#"
                                             className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                                         >
@@ -267,7 +268,7 @@ const Navbar = (props) => {
 
                                                     />
                                                     <button
-                                                        onClick={()=>{signIn('google')}}
+                                                        onClick={() => { signIn('google') }}
                                                         type="button"
                                                         className="mt-3  inline-flex w-full justify-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50 w-full"
 
@@ -369,7 +370,7 @@ const Navbar = (props) => {
 
                                                     />
                                                     <button
-                                                        onClick={()=>{signIn('google')}}
+                                                        onClick={() => { signIn('google') }}
                                                         type="button"
                                                         className="mt-3  inline-flex w-full justify-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50 w-full"
 
