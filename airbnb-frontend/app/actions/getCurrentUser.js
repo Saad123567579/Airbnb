@@ -4,6 +4,7 @@ import prisma from "../lib/prismadb";
 async function getSession() {
     return await getServerSession(authOptions);
 }
+
 export default async function getCurrentUser() {
 
     const session = await getSession();
