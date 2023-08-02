@@ -28,3 +28,9 @@ export async function POST(request) {
 
 
 }
+
+export async function GET(request){
+    const listings = await prisma.listing.findMany();
+    return NextResponse.json(listings);
+    
+}
