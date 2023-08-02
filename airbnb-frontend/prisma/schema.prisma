@@ -1,9 +1,5 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-//mongodb+srv://saady:429331@cluster0.azmorz9.mongodb.net/Airbnb
-
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
@@ -11,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url      = "mongodb+srv://saady:429331@cluster0.azmorz9.mongodb.net/Airbnb"
+  url      = env("DATABASE_URL")
 }
 
 model User {
