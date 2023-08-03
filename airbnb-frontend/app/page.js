@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import Link from 'next/link';
 export default function Home() {
   const [properties, setProperties] = useState(null);
 
@@ -63,7 +64,7 @@ export default function Home() {
             </div>
             <div className="flex flex-row justify-around">
             <button class="p-1 text-rose-600 border-rose-600 border-2 rounded-lg hover:text-white hover:bg-rose-600" id={property.id} onClick={handleWishlist} >Wishlist</button>
-            <button class="p-1 text-rose-600 border-rose-600 border-2 rounded-lg hover:text-white hover:bg-rose-600">Reserve Now</button>
+            <Link href={`listitem/${property.id}`} class="p-1 text-rose-600 border-rose-600 border-2 rounded-lg hover:text-white hover:bg-rose-600">Reserve Now</Link>
             </div>
           </div>
         ))}
