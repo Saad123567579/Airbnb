@@ -117,35 +117,36 @@ const Navbar = (props) => {
                 )}
 
                 {isOpen && currentUser && (
-                  <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-lg">
-                    <a
+                  <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-lg z-50">
+                    <Link
                       onClick={() => {}}
-                      href="#"
+                      href="/"
+                      className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                    >
+                      Home
+                    </Link>
+                    <Link
+                      onClick={() => {}}
+                      href="/trips"
                       className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                     >
                       My Trips
-                    </a>
-                    <a
+                    </Link>
+                    <Link
                       onClick={() => {}}
-                      href="#"
+                      href="/favourite"
                       className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                     >
                       My Favourites
-                    </a>
-                    <a
+                    </Link>
+                    
+                    <Link
                       onClick={() => {}}
-                      href="#"
-                      className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                    >
-                      My Reservations
-                    </a>
-                    <a
-                      onClick={() => {}}
-                      href="#"
+                      href="/myListing"
                       className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                     >
                       My Properties
-                    </a>
+                    </Link>
                     <Link
                       onClick={() => {
                         sethome(true);

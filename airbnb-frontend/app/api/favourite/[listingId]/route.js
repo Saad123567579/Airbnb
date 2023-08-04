@@ -43,5 +43,3 @@ export async function GET(request, params) {
     return NextResponse.json("An error occurred");
   }
 }
-
-

@@ -1,25 +1,54 @@
 'use client'
-import React, { useState, useEffect } from "react";
+import React, {useRef,useState, useEffect } from "react";
 import { parseISO, format, addDays, differenceInDays } from 'date-fns';
 import DatePicker from "react-datepicker";
 // import "react-datepicker/dist/react-datepicker.css";
+import { toast } from "react-toastify";
 
 const MyPage = (params) => {
+    const ref = useRef();
     let id = params.params.id;
     const [item, Setitem] = useState(null);
     const [owner, Setowner] = useState(null);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const date = new Date();
-
+    const [days,Setdays] = useState(0);
+    const [subtotal,Setprice] = useState(0);
+    const [status,Setstatus] = useState("idle");
     const handleDateChange = (event) => {
         const { name, value } = event.target;
         if (name === 'startDate') {
           setStartDate(value);
+          console.log(value);
         } else if (name === 'endDate') {
           setEndDate(value);
+          console.log(value);
         }
+       
+
       };
+
+       // Function to calculate the number of reserved nights
+    const calculateReservedNights = () => {
+        if (startDate && endDate) {
+            const startDateObj = new Date(startDate);
+            const endDateObj = new Date(endDate);
+
+            // Check if the selected end date is not before the selected start date
+            if (endDateObj >= startDateObj) {
+                return differenceInDays(endDateObj, startDateObj);
+            }
+        }
+        return 0;
+    };
+      useEffect(() => {
+        // Recalculate reserved nights whenever startDate or endDate changes
+        let x = calculateReservedNights();
+       
+        Setdays(x);
+        Setprice(ref?.current?.id?(ref.current.id*x):(0))
+
+    }, [startDate, endDate]);
 
 
     useEffect(() => {
@@ -37,40 +66,33 @@ const MyPage = (params) => {
         };
         fetchListItem();
     }, []);
+
+    const handleReserve = async () => {
+        if(days<=0) {toast.error("Please select the dates correctly ");return;}
+        const url = "/api/reserve/";
+        let data = {startDate,endDate,totalPrice:subtotal,listingId:document.getElementById('list').getAttribute('name')}
+        console.log(data);
+        Setstatus("loading");
+        const response = await fetch(url,{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Add any other headers you need here
+            },
+            body: JSON.stringify(data),
+        })
+        const d = await response.json();
+        Setstatus("idle");
+        if(d=="no user found") toast.error("Please sign up before reservation");
+        if(d=="Internal Server Error") toast.error("Internal Server Error. Please Try Again");
+        if(d=="done") {toast.success("Listing Successfully Created")};
+
+
+
+    }
     
 
-    // Handle date changes
-    const handleStartDateChange = (date) => {
-        // Check if the selected start date is not in the past
-        if (date >= today) {
-            setStartDate(date);
-        }
-    };
-
-    const handleEndDateChange = (date) => {
-        // Check if the selected end date is not in the past
-        if (date >= today) {
-            setEndDate(date);
-        }
-    };
-
-    // Calculate the number of reserved nights
-    const calculateReservedNights = () => {
-        if (startDate && endDate) {
-            const differenceInTime = endDate.getTime() - startDate.getTime();
-            const differenceInDays = differenceInTime / (1000 * 3600 * 24);
-            return Math.floor(differenceInDays);
-        }
-        return 0;
-    };
-
-    // Disable dates that are already reserved
-    const isDateDisabled = (date) => {
-        // Here, you'll need to implement logic to check if the date is within an existing reservation
-        // For example, if there is already a reservation from March 1 to March 5, you need to disable those dates
-        // You might need to manage a list of reservations and compare the selected date against them.
-        return false; // Return true if the date should be disabled
-    };
+    
 
 
     return (
@@ -84,7 +106,7 @@ const MyPage = (params) => {
                         <img alt="img" className="rounded-lg h-2/4" src={item.imageSrc} />
                         <div className="flex mt-5 pb-5 border-b-2 align-middle">
                             <div>
-                                <h1 className="font-bold">{owner.name}</h1>
+                                <h1 className="font-bold" id="list" name={item.id}>{owner.name}</h1>
                                 <h1>{item.guestCount} guests . {item.roomCount} bedrooms . {item.bathroomCount} bathrooms</h1>
                             </div>
                             <div className="ml-auto pt-3">
@@ -99,17 +121,19 @@ const MyPage = (params) => {
 
                 <div className="border-2 0 m-auto flex flex-col justify-start items-start mt-5 mb-5 ml-32 h-96 w-7/8 rounded-xl  ">
                     <h1 className="ml-5 mt-5  text-xl font-b self-center">Reserve Here</h1>
-                    <h2 className="ml-5 mt-5 font-semibold text-lg self-center">${item.price} A Night</h2>
+                    <h2 className="ml-5 mt-5 font-semibold text-lg self-center" ref={ref} id={item.price} >${item.price} A Night</h2>
+                    <h2 className="ml-5 mt-5 font-semibold text-lg self-center">${subtotal} Total</h2>
+
                     <div className="mt-5 ml-5 self-center border-2 p-1">
                         <label for="Check-In" className="ml-2">Check-In</label>
-                        <input onChange={handleDateChange} min={date} type="date" id="Check-In" />
+                        <input onChange={handleDateChange}  name='startDate' min={format(new Date(), 'yyyy-MM-dd')} type="date" id="Check-In" />
                     </div>
                     <div className="mt-5 ml-5 self-center border-2 p-1">
                         <label for="Check-Out">Check-Out</label>
-                        <input onChange={handleDateChange}  type="date" id="Check-Out" />
+                        <input onChange={handleDateChange} name="endDate"  type="date" id="Check-Out" />
                     </div>
                     <div className="mt-5 ml-5 self-center">
-                        <button className="text-rose-600 border-2 p-2  border-rose-600 hover:text-white hover:bg-rose-600 ">Reserve Now</button>
+                        <button className={`text-rose-600 border-2 p-2  border-rose-600 hover:text-white hover:bg-rose-600 ${status==="idle"?("cursor-pointer"):("cursor-wait")} `} onClick={handleReserve}>Reserve Now</button>
                     </div>
                 </div>
             </>
